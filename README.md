@@ -1,5 +1,8 @@
 # ISOWmodelling: A Hybrid Reconstruction of Deep North Atlantic Circulation Over the Last 800,000 Years.
 
+![Licence MIT](https://img.shields.io/badge/license-MIT-green)
+![Python](https://img.shields.io/badge/python-3.11+-blue)
+
 This repository contains the full modelling framework developed to reconstruct the strength 
 of the Iceland-Scotland Overflow Water (ISOW), a key deep branch of the North Atlantic Deep 
 Water (NADW), over the last 800,000 years. The approch combines linear regression and 
