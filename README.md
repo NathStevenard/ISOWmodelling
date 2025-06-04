@@ -10,8 +10,9 @@ machine learning (XGBoost) in a Monte Carlo setting to capture both linear and n
 relationships between climate forcings and ISOW variability.
 
 The model and dataset are described in detail in:
+
 Stevenard, N., Govin, A., Kissel, C., Swingedouw, D., Toucanne, S., & Bouttes, N, in prep.
-800,000 years of deep North Atlantic bistability.
+*800,000 years of deep North Atlantic bistability*.
 
 ---
 
@@ -35,6 +36,9 @@ pip install .
 ```
 
 ## How to use
+
+In your folder ***ISOWmodelled/***, create a new Python file (or use *test_script.py*). Once created, you can use ***"import isow"*** and run the functions.
+
 ```python
 import isow
 
@@ -50,12 +54,12 @@ isow_modeled, shap_values = isow.model(start, end, nsim=100)
 plot = isow.plots.PlotISOW(start, end)
 plot.summary()  
 ```
-More details are available in the test_script.py file.
+More details are available in the *test_script.py* file.
 
 ---
 ## Input data
 
-All preprocessed time series are located in data/, including:
+All preprocessed time series are located in ***data/***, including:
     
     Obliquity and Precession (Berger & Loutre, 1991)
 
