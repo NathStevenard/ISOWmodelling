@@ -18,7 +18,7 @@ Stevenard, N., Govin, A., Kissel, C., Swingedouw, D., Toucanne, S., & Bouttes, N
 
 ```bash
 git clone https://github.com/NathStevenard/ISOWmodelling.git
-cd ISOWmodelling_clean
+cd ISOWmodelling
 ```
 **Install the requirements**
 ```
