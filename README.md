@@ -18,28 +18,37 @@ Stevenard, N., Govin, A., Kissel, C., Swingedouw, D., Toucanne, S., & Bouttes, N
 ## Quickstart
 
 **Clone the repository:**
-
 ```bash
 git clone https://github.com/NathStevenard/ISOWmodelling.git
 cd ISOWmodelling
 ```
-**Install the requirements**
+
+**Create and activate a virtual environment**
+```bash
+python -m venv env
+source env/bin/activate
 ```
-pip install -r requirements.txt
+
+**Install the package and dependancy**
+```bash
+pip install .
 ```
 
 ## How to use
-```
+```python
 import isow
 
+start = 0
+end = 0
 # Run the cross-validation:
 results, X_splits, residuals = isow.k_fold_cross_validation(k=5, save=True, plot=True)
 
 # Run the model for the last 800,000 years
-isow_modeled, shap_values = isow.model(nsim=100)
+isow_modeled, shap_values = isow.model(start, end, nsim=100)
 
 # Plot the results
-isow.plots.summary()  
+plot = isow.plots.PlotISOW(start, end)
+plot.summary()  
 ```
 More details are available in the test_script.py file.
 
@@ -54,7 +63,7 @@ All preprocessed time series are located in data/, including:
 
     Benthic d18O from the IODP site U1385 (Hodell et al., 2023)
 
-    Ice-rafted debris (IRD) and N. pachyderma sinistral (NPS) counts from ODP site 983 
+    Ice-rafted debris (IRD, in log) and N. pachyderma sinistral (NPS) counts from ODP site 983 
     (Barker et al., 2021)
 
     ISOW strength stack based on a Monte Carlo process using Principal Component Analysis. 
