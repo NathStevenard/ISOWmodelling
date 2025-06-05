@@ -3,6 +3,8 @@
 ![Licence MIT](https://img.shields.io/badge/license-MIT-green)
 ![Python](https://img.shields.io/badge/python-3.11+-blue)
 
+---
+
 This repository contains the full modelling framework developed to reconstruct the strength 
 of the Iceland-Scotland Overflow Water (ISOW), a key deep branch of the North Atlantic Deep 
 Water (NADW), over the last 800,000 years. The approch combines linear regression and 
@@ -13,6 +15,17 @@ The model and dataset are described in detail in:
 
 Stevenard, N., Govin, A., Kissel, C., Swingedouw, D., Toucanne, S., & Bouttes, N, in prep.
 *800,000 years of deep North Atlantic bistability*.
+
+**DISCLAIMER**
+
+This code is provided under the MIT License. However, **any scientific use of this code, 
+including but not limited to publication, citation, or distribution of results derived from 
+it, is strictly prohibited without prior written permission from the author(s).**
+
+By accessing or using this repository, you agree to respect this restriction. For any 
+inquiries or requests regarding scientific use, please contact the repository owner directly.
+
+Thank you for your understanding.
 
 ---
 
