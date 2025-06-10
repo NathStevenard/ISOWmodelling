@@ -219,7 +219,7 @@ class PlotISOW():
             data=self.X_ext.values,
             feature_names=list(shap_values.columns)
         )
-        shap.plots.bar(shap_exp_median)
+        shap.plots.bar(shap_exp_median, show=False)
         plt.savefig(self.DIR_FIG / "SHAP_bar_plot.png", dpi=300)
 
     def shap_time_series(self):
