@@ -3,6 +3,9 @@ from .utils import resample
 
 from pathlib import Path
 import matplotlib.pyplot as plt
+import matplotlib.cm as cm
+import matplotlib.colors as colors
+from matplotlib.collections import LineCollection
 import pandas as pd
 import seaborn as sns
 import shap
@@ -158,7 +161,7 @@ class PlotISOW():
         # ISOW strength
         self.shading_plot(self.age, ISOW_modeled, (0, 0, 1), axes[3], [lim[0], lim[1]])
         axes[3].set_ylabel('ISOW$_{data}$', fontweight="bold", color="blue")
-        axes[3].set_xlabel('Age (ka)', fontweight='bold')
+        axes[3].set_xticklabels([])
         axes[3].tick_params(axis='y', colors='blue')
         axes[3].yaxis.set_label_position('right')
         axes[3].yaxis.tick_right()
@@ -166,7 +169,7 @@ class PlotISOW():
         # ODP-983 data
         axes[4].fill_between(self.age, self.X_ext['NPS'], 0, color='tomato', alpha=0.6)
         axes[4].set_ylabel('ODP-983 NPS (%)', fontweight="bold", color="tomato")
-        axes[4].set_xticklabels([])
+        axes[4].set_xlabel('Age (ka)', fontweight='bold')
         axes[4].invert_yaxis()
         axes[4].set_ylim(100, 0)
         axes[4].tick_params(axis='y', colors='tomato')
@@ -175,7 +178,6 @@ class PlotISOW():
         axes2 = axes[4].twinx()
         axes2.fill_between(self.age, np.exp(self.X_ext['IRD']), 0, color='cornflowerblue', alpha=0.6)
         axes2.set_ylabel('ODP-983 IRD (#/g)', fontweight="bold", color="cornflowerblue")
-        axes2.set_xticklabels([])
         axes2.set_ylim(0, 4000)
         axes2.tick_params(axis='y', colors='cornflowerblue')
         axes2.set_xlim(lim[0], lim[1])
@@ -194,8 +196,12 @@ class PlotISOW():
         except:
             raise "SHAP values are not already determined. Please, run isow.model() before trying to plot."
         # --- SHAP SUMMARY PLOT ---
+
         plt.figure(figsize=(10, 6))
-        shap.summary_plot(shap_values.values, self.X_ext, show=False)
+        shap.summary_plot(shap_values.values,
+                          self.X_ext.values,
+                          feature_names=shap_values.columns.tolist(),
+                          show=False)
         plt.savefig(self.DIR_FIG / "SHAP_summary_plot.png", dpi=300)
 
     def shap_bars(self):
@@ -226,6 +232,7 @@ class PlotISOW():
             raise "SHAP values are not already determined. Please, run isow.model() before trying to plot."
         # --- SHAP TIME-SERIES PLOT ---
         shap_df = shap_values.copy()
+        features = shap_values.columns.tolist()
 
         # Define subplot dimensions
         num_features = len(shap_values.columns)
@@ -236,14 +243,36 @@ class PlotISOW():
         fig, axes = plt.subplots(rows, cols, figsize=(15, rows * 3), sharex=True, sharey=True)
         axes = axes.flatten()  # Transformer en liste pour itération facile
 
+        # Internal function to extract "colors"
+        def get_colormap(values):
+            norm = colors.Normalize(vmin=np.nanmin(values), vmax=np.nanmax(values))
+            cmap = cm.coolwarm
+            return cmap, norm
+
         # Plot each feature
         for i, feature in enumerate(shap_values.columns):
             ax = axes[i]
-            ax.plot(shap_df.index, shap_df[feature], label=feature, color="royalblue", alpha=0.8, linewidth=0.7)
+            feat = features[i]
+            shap_val = shap_values[feat].values
+            feat_val = self.X_ext[feat].values
 
-            ax.axhline(0, color='black', linestyle='dashed', linewidth=0.5)
-            ax.set_title(feature, fontsize=10)
+            cmap, norm = get_colormap(feat_val)
+            color_vals = cmap(norm(feat_val))
+
+            # Line colored by feature value
+            points = np.array([self.age, shap_val]).T.reshape(-1, 1, 2)
+            segments = np.concatenate([points[:-1], points[1:]], axis=1)
+
+            # Create LineCollection with colors mapped to feature values
+            lc = LineCollection(segments, colors=color_vals, linewidths=1)
+            ax.add_collection(lc)
+            lc.set_rasterized(True)
+
+            ax.axhline(0, color='gray', linewidth=0.5, linestyle='--')
             ax.set_xlim(0, 800)
+            ax.set_ylim(-3, 2)
+            ax.set_title(feat, fontsize=10)
+            ax.set_ylabel("SHAP")
 
         # Remove empty subplots
         for j in range(i + 1, len(axes)):
