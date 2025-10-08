@@ -4,6 +4,9 @@ from .utils import best_xgb_params
 from .utils import fit_imputer
 from .utils import impute_data
 from .plots import plot_kfold_residuals
+from .logging_utils import get_logger
+
+log = get_logger(__name__)
 
 import os
 from pathlib import Path
@@ -36,6 +39,7 @@ def k_fold_cross_validation(k=5, save=False, plot=False):
         - X_splits: X_train used for each fold
         - resid: y_val - prediction for each fold
     """
+    log.info("~~~~~~~~~~~~ k-fold cross validation is starting ~~~~~~~~~~~~")
     # Load the data
     X, _, y = load_data()
     y = pd.Series(y["pct_50"])
@@ -54,7 +58,7 @@ def k_fold_cross_validation(k=5, save=False, plot=False):
 
     # Run the cross-validation
     for fold, (train_index, val_index) in enumerate(kf.split(X), start=1):
-        print(f"==> Fold {fold}/{k} is running...")
+        log.info(f"==> Fold {fold}/{k} is running...")
 
         # ---- PREPROCESSING ----
         # Select training and validation datasets
@@ -115,7 +119,7 @@ def k_fold_cross_validation(k=5, save=False, plot=False):
         X_splits.append(X_train_xgb)
         resid.append(y_val - y_val_pred_final)
 
-        print(f"Fold {fold} - RMSE: {rmse:.4f}, R²: {r2:.4f}, Pearson: {pearson_corr:.4f}, Spearman: {spearman_corr:.4f}")
+        log.info(f"Fold {fold} - RMSE: {rmse:.4f}, R²: {r2:.4f}, Pearson: {pearson_corr:.4f}, Spearman: {spearman_corr:.4f}")
 
     # Summarize the metrics (average performance)
     metrics = {
@@ -126,11 +130,11 @@ def k_fold_cross_validation(k=5, save=False, plot=False):
     }
 
     # Print the average performances
-    print("\nPerformance summary:")
-    print(f"RMSE: {metrics['RMSE_mean']:.4f} ± {metrics['RMSE_std']:.4f}")
-    print(f"R²: {metrics['R2_mean']:.4f} ± {metrics['R2_std']:.4f}")
-    print(f"Pearson: {metrics['Pearson_mean']:.4f} ± {metrics['Pearson_std']:.4f}")
-    print(f"Spearman: {metrics['Spearman_mean']:.4f} ± {metrics['Spearman_std']:.4f}")
+    log.info("Performance summary:")
+    log.info(f"RMSE: {metrics['RMSE_mean']:.4f} ± {metrics['RMSE_std']:.4f}")
+    log.info(f"R²: {metrics['R2_mean']:.4f} ± {metrics['R2_std']:.4f}")
+    log.info(f"Pearson: {metrics['Pearson_mean']:.4f} ± {metrics['Pearson_std']:.4f}")
+    log.info(f"Spearman: {metrics['Spearman_mean']:.4f} ± {metrics['Spearman_std']:.4f}")
 
     results = {"Trained_models": trained_models}
 
@@ -141,10 +145,10 @@ def k_fold_cross_validation(k=5, save=False, plot=False):
         # Export the metrics
         output = pd.DataFrame(list(metrics.items()), columns=["Metric", "Value"])
         output.to_csv(DIR_OUTPUT / "performances.csv")
-        print("\n Metrics are saved in :", DIR_OUTPUT / "performances.csv")
+        log.info("Metrics are saved in :", DIR_OUTPUT / "performances.csv")
 
     if plot:
         plot_kfold_residuals(resid)
 
-    print("\n~~~~~~~~~~~~ The K-fold cross correlation is done. ~~~~~~~~~~~~")
+    log.info("~~~~~~~~~~~~ The K-fold cross correlation is done. ~~~~~~~~~~~~")
     return results, X_splits, resid

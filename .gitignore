@@ -15,6 +15,7 @@ env/
 
 # Output files
 outputs/
+figures/
 *.csv
 *.png
 *.tsv

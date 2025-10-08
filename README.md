@@ -7,7 +7,7 @@
 
 This repository contains the full modelling framework developed to reconstruct the strength 
 of the Iceland-Scotland Overflow Water (ISOW), a key deep branch of the North Atlantic Deep 
-Water (NADW), over the last 800,000 years. The approch combines linear regression and 
+Water (NADW), over the last 800,000 years. The approach combines linear regression and 
 machine learning (XGBoost) in a Monte Carlo setting to capture both linear and nonlinear 
 relationships between climate forcings and ISOW variability.
 
@@ -31,6 +31,10 @@ Thank you for your understanding.
 
 ## Quickstart
 
+**Requirements**
+- Python 3.10–3.12 recommanded
+- recent `pip`: `python -m pip install --upgrade pip`
+
 **Clone the repository:**
 ```bash
 git clone https://github.com/NathStevenard/ISOWmodelling.git
@@ -39,8 +43,9 @@ cd ISOWmodelling
 
 **Create and activate a virtual environment**
 ```bash
-python -m venv env
-source env/bin/activate
+python -m venv env 
+source env/bin/activate       # macOS / Linux
+# .\env\Scripts\Activate.ps1  # Windows (PowerShell)
 ```
 
 **Install the package and dependancy**
@@ -48,9 +53,14 @@ source env/bin/activate
 pip install .
 ```
 
+**Verify the install (optional)
+```bash
+python -c "import isow; print(getattr(isow, '__version__', 'installed'))"
+```
+
 ## How to use
 
-In your folder ***ISOWmodelled/***, create a new Python file (or use *test_script.py*). Once created, you can use ***"import isow"*** and run the functions.
+In your folder ***ISOWmodelled/***, create a new Python file (or use *example_script.py*). Once created, you can use ***"import isow"*** and run the functions.
 
 ```python
 import isow
@@ -67,7 +77,7 @@ isow_modeled, shap_values = isow.model(start, end, nsim=100)
 plot = isow.plots.PlotISOW(start, end)
 plot.summary()  
 ```
-More details are available in the *test_script.py* file.
+More details are available in the *example_script.py* file.
 
 ---
 ## Input data
@@ -105,13 +115,13 @@ The hybrid modeling pipeline works in two steps:
 
 ## Outputs
 
-    Performances: metrics related to the cross-validation    
+    ./outputs/performances.csv: metrics related to the cross-validation    
 
-    ISOW_modeled: predicted ISOW strength over the 0-800,000 year period (percentiles)
+    ./outputs/ISOW_modeled.csv: predicted ISOW strength over the 0-800,000 year period (percentiles)
 
-    SHAP_values: SHAP (Lundberg & Lee, 2017) time series for each features
+    ./outputs/SHAP_values.csv: SHAP (Lundberg & Lee, 2017) time series for each features
 
-    Figures: figures associated with the plot functions
+    ./Figures/: all your figures saved in .png
 
 ---
 
@@ -136,5 +146,6 @@ Please do not forget to cite developers for all Python module you use.
 
 ## Contact
 
-For questions or contributions, please contact:
-nathan.stevenard@univ-grenoble-alpes.fr or open an issue.
+For questions or contributions, please:
+- contact me at nathan.stevenard@univ-grenoble-alpes.fr
+- or open an issue at https://github.com/NathStevenard/ISOWmodelling/issues

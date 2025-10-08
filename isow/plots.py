@@ -1,5 +1,8 @@
 from .utils import load_data
 from .utils import resample
+from .logging_utils import get_logger
+
+log = get_logger(__name__)
 
 from pathlib import Path
 import matplotlib.pyplot as plt
@@ -52,14 +55,13 @@ def plot_kfold_residuals(residuals_list):
 
     plt.tight_layout()
     plt.savefig(DIR_FIG / "residuals_kfold.png", dpi=300)
-    plt.show()
     print("\n The figure (k-fold residuals) is saved as :", DIR_FIG / "residuals_kfold.png")
 
 # ----------------------------------------------------------------------------------------------------------------
 # ----------------------------------------------------------------------------------------------------------------
 # ----------------------------------------------------------------------------------------------------------------
 
-class PlotISOW():
+class PlotISOW:
     def __init__(self, start, end):
         self.DIR_DATA = Path('./outputs').resolve()
         self.DIR_FIG = Path('./figures').resolve()
@@ -161,7 +163,7 @@ class PlotISOW():
         # ISOW strength
         self.shading_plot(self.age, ISOW_modeled, (0, 0, 1), axes[3], [lim[0], lim[1]])
         axes[3].set_ylabel('ISOW$_{data}$', fontweight="bold", color="blue")
-        axes[3].set_xticklabels([])
+        #axes[3].set_xticklabels([])
         axes[3].tick_params(axis='y', colors='blue')
         axes[3].yaxis.set_label_position('right')
         axes[3].yaxis.tick_right()
@@ -184,9 +186,9 @@ class PlotISOW():
 
         plt.tight_layout()
         plt.savefig(self.DIR_FIG / "isow_modeled_summary.png", dpi=300)
-        plt.show()
+        log.info(f"Summary plot is saved in {self.DIR_FIG}")
 
-    # ~~~~~~~~~~~~~~~~ SHAP PLOTS ~~~~~~~~~~~~~~~~
+        # ~~~~~~~~~~~~~~~~ SHAP PLOTS ~~~~~~~~~~~~~~~~
     def shap_summary(self):
         """
         Method to save a violin plot of SHAP values.
@@ -194,7 +196,7 @@ class PlotISOW():
         try:
             shap_values = pd.read_csv(self.DIR_DATA / "SHAP_values.csv", delimiter="\t", index_col=0)
         except:
-            raise "SHAP values are not already determined. Please, run isow.model() before trying to plot."
+            raise log.error("SHAP values are not already determined. Please, run isow.model() before trying to plot.")
         # --- SHAP SUMMARY PLOT ---
 
         plt.figure(figsize=(10, 6))
@@ -203,6 +205,7 @@ class PlotISOW():
                           feature_names=shap_values.columns.tolist(),
                           show=False)
         plt.savefig(self.DIR_FIG / "SHAP_summary_plot.png", dpi=300)
+        log.info(f"SHAP summary plot is saved in {self.DIR_FIG}")
 
     def shap_bars(self):
         """
@@ -211,7 +214,7 @@ class PlotISOW():
         try:
             shap_values = pd.read_csv(self.DIR_DATA / "SHAP_values.csv", delimiter="\t", index_col=0)
         except:
-            raise "SHAP values are not already determined. Please, run isow.model() before trying to plot."
+            raise log.error("SHAP values are not already determined. Please, run isow.model() before trying to plot.")
         # --- SHAP BAR PLOT ---
         plt.figure(figsize=(10, 6))
         shap_exp_median = shap.Explanation(
@@ -221,6 +224,7 @@ class PlotISOW():
         )
         shap.plots.bar(shap_exp_median, show=False)
         plt.savefig(self.DIR_FIG / "SHAP_bar_plot.png", dpi=300)
+        log.info(f"SHAP histogram is saved in {self.DIR_FIG}")
 
     def shap_time_series(self):
         """
@@ -229,7 +233,7 @@ class PlotISOW():
         try:
             shap_values = pd.read_csv(self.DIR_DATA / "SHAP_values.csv", delimiter="\t", index_col=0)
         except:
-            raise "SHAP values are not already determined. Please, run isow.model() before trying to plot."
+            raise log.error("SHAP values are not already determined. Please, run isow.model() before trying to plot.")
         # --- SHAP TIME-SERIES PLOT ---
         shap_df = shap_values.copy()
         features = shap_values.columns.tolist()
@@ -241,7 +245,7 @@ class PlotISOW():
 
         # Create the figure
         fig, axes = plt.subplots(rows, cols, figsize=(15, rows * 3), sharex=True, sharey=True)
-        axes = axes.flatten()  # Transformer en liste pour itération facile
+        axes = axes.flatten()
 
         # Internal function to extract "colors"
         def get_colormap(values):
@@ -283,7 +287,7 @@ class PlotISOW():
         fig.suptitle("SHAP Time Series on 800 ka (Feature Contributions)", fontsize=14, fontweight='bold')
         plt.tight_layout(rect=[0, 0, 1, 0.96])
         plt.savefig(self.DIR_FIG / "SHAP_time-series_plot.png", dpi=300)
-        plt.show()
+        log.info(f"SHAP time series figure is saved in {self.DIR_FIG}")
 
     def shap_dependance(self):
         """
@@ -292,7 +296,7 @@ class PlotISOW():
         try:
             shap_values = pd.read_csv(self.DIR_DATA / "SHAP_values.csv", delimiter="\t", index_col=0)
         except:
-            raise "SHAP values are not already determined. Please, run isow.model() before trying to plot."
+            raise log.error("SHAP values are not already determined. Please, run isow.model() before trying to plot.")
         # --- SHAP DEPENDANCE PLOT ---
         # Create the figure
         fig, axes = plt.subplots(2, 3, figsize=(16, 8), sharey=True)
@@ -317,5 +321,4 @@ class PlotISOW():
         # Adjust the figure
         plt.tight_layout()
         plt.savefig(self.DIR_FIG / "SHAP_dependance_plot.png", dpi=300)
-        plt.show()
-
+        log.info(f"SHAP dependance plot is saved in {self.DIR_FIG}")

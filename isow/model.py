@@ -5,6 +5,9 @@ from .utils import impute_data
 from .utils import best_xgb_params
 from .utils import split_data
 from .utils import fit_imputer
+from .logging_utils import get_logger
+
+log = get_logger(__name__)
 
 import os
 from pathlib import Path
@@ -39,18 +42,18 @@ def model(start, end, nsim=100):
         - output --> percentiles of the ISOW_model for the desired time period.
         - shap_values_median_df --> associated SHAP values for each forcing used.
     """
-    print("\n~~~~~~~~~~~~ The prediction of ISOW strength is starting ~~~~~~~~~~~~")
+    log.info("~~~~~~~~~~~~ The prediction of ISOW strength is starting ~~~~~~~~~~~~")
 
     # --- CHECK INPUTS ---
     if not isinstance(start, int) or not isinstance(start, int):
-        raise TypeError('The starting date must be an integer or a float')
+        raise log.error(TypeError('The starting date must be an integer or a float'))
     if not isinstance(end, int) or not isinstance(end, int):
-        raise TypeError('The ending date must be an integer or a float')
+        raise log.error(TypeError('The ending date must be an integer or a float'))
 
     if start < 0 or start > 800 or start > end:
-        raise ValueError('The starting date must be comprised between 0 and 800 and lower than "end" value.')
+        raise log.error(ValueError('The starting date must be comprised between 0 and 800 and lower than "end" value.'))
     if end < 0 or end > 800:
-        raise ValueError('The ending date must be comprised between 0 and 800.')
+        raise log.error(ValueError('The ending date must be comprised between 0 and 800.'))
 
     # --- PREPARE DATA ---
     # Load the data
@@ -60,6 +63,9 @@ def model(start, end, nsim=100):
     # Prepare output data
     y_pred_all = []
     shap_values_list = []
+
+    log.info("Data loaded.")
+    log.info(f"The prediction for the {start}-{end} period will start with {nsim} iterations")
 
     # --- START THE PREDICTION ---
     for i in tqdm(range(nsim), desc="Bootstrap Iterations"):
@@ -76,6 +82,7 @@ def model(start, end, nsim=100):
         X_val_lin, X_val_xgb = x_for_models(X_val)
         X_ext_lin, X_ext_xgb = x_for_models(X_ext)
 
+        # ---- TRAINING: LINEAR MODEL ----
         # Imputation of NaN values
         imputer_lin = fit_imputer(X_train_lin)
         X_train_lin = impute_data(X_train_lin, imputer_lin)
@@ -87,7 +94,7 @@ def model(start, end, nsim=100):
         X_val_xgb = impute_data(X_val_xgb, imputer_xgb)
         X_ext_xgb = impute_data(X_ext_xgb, imputer_xgb)
 
-        # ---- TRAINING: LINEAR MODEL ----
+
         # Start to train the linear model
         model_linear.fit(X_train_lin, y_train)
         y_train_pred = model_linear.predict(X_train_lin) # To calculate the residues of training
@@ -157,10 +164,10 @@ def model(start, end, nsim=100):
 
     # Export predictions (percentiles)
     output.to_csv(DIR_OUTPUT / "ISOW_modeled.csv", sep='\t', index=True)
-    print("ISOW_modeled is saved in: ", DIR_OUTPUT / "ISOW_modeled.csv")
+    log.info("ISOW_modeled is saved in: ", DIR_OUTPUT / "ISOW_modeled.csv")
     # Export SHAP values
     shap_values_median_df.to_csv(DIR_OUTPUT / "SHAP_values.csv", sep='\t', index=True)
-    print("SHAP values are saved in: ", DIR_OUTPUT / "SHAP_values.csv")
+    log.info("SHAP values are saved in: ", DIR_OUTPUT / "SHAP_values.csv")
 
-    print("\n~~~~~~~~~~~~~ Prediction of ISOW strength is done ~~~~~~~~~~~~~")
+    log.info("~~~~~~~~~~~~~ Prediction of ISOW strength is done ~~~~~~~~~~~~~")
     return output, shap_values_median_df
