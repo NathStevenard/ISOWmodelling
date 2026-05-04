@@ -1,5 +1,6 @@
 # ISOWmodelling: A Hybrid Reconstruction of Deep North Atlantic Circulation Over the Last 800,000 Years.
 
+![DOI](https://zenodo.org/badge/972065800.svg)(https://doi.org/10.5281/zenodo.20023782)
 ![Licence MIT](https://img.shields.io/badge/license-MIT-green)
 ![Python](https://img.shields.io/badge/python-3.11+-blue)
 
